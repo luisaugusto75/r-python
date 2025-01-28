@@ -40,6 +40,9 @@ pub enum Expression {
     LT(Box<Expression>, Box<Expression>),
     GTE(Box<Expression>, Box<Expression>),
     LTE(Box<Expression>, Box<Expression>),
+
+    /*print function */
+    Print(Box<Expression>),
 }
 
 #[derive(Debug, PartialEq, Clone)]
