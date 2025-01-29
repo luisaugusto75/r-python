@@ -291,7 +291,27 @@ pub fn print(content: Expression, env: &Environment) -> Result<Expression, Error
             println!("{}", s);
             Ok(Expression::CString(s))
         }
-    _ => Err(String::from("Print function only accepts strings.")),
+        Expression::CInt(i) =>
+        {
+            println!("{}", i);
+            Ok(Expression::CInt(i))
+        }
+        Expression::CReal(f) =>
+        {
+            println!("{:.16}", f);
+            Ok(Expression::CReal(f))
+        }
+        Expression::CTrue =>
+        {
+            println!("True");
+            Ok(Expression::CString("True".to_string()))
+        }
+        Expression::CFalse =>
+        {
+            println!("False");
+            Ok(Expression::CString("False".to_string()))
+        }
+    _ => Err(String::from("Print function does not accept this format.")),
     }
 }
 
@@ -338,14 +358,55 @@ mod tests {
     use approx::relative_eq;
 
     #[test]
-    fn eval_print() {
+    fn eval_print_string() {
         let env = HashMap::new();
         let print_stmt = Expression::CString("Testando print".to_string());
         match print(print_stmt, &env) {
             Ok(result) => assert_eq!(result, Expression::CString("Testando print".to_string())),
             Err(e) => assert!(false, "Erro ao executar função Print: {}", e),
         }
-}
+    }
+
+    #[test]
+    fn eval_print_int() {
+        let env = HashMap::new();
+        let print_stmt = Expression::CInt(1);
+        match print(print_stmt, &env) {
+            Ok(result) => assert_eq!(result, Expression::CInt(1)),
+            Err(e) => assert!(false, "Erro ao executar função Print: {}", e),
+        }
+    }
+    
+    #[test]
+    fn eval_print_float() {
+        let env = HashMap::new();
+        let print_stmt = Expression::CReal(1.00);
+        match print(print_stmt, &env) {
+            Ok(result) => assert_eq!(result, Expression::CReal(1.00)),
+            Err(e) => assert!(false, "Erro ao executar função Print: {}", e),
+        }
+    }
+
+    #[test]
+    fn eval_print_true() {
+        let env = HashMap::new();
+        let print_stmt = Expression::CTrue;
+        match print(print_stmt, &env) {
+            Ok(result) => assert_eq!(result, Expression::CString("True".to_string())),
+            Err(e) => assert!(false, "Erro ao executar função Print: {}", e),
+        }
+    }
+
+    #[test]
+    fn eval_print_false() {
+        let env = HashMap::new();
+        let print_stmt = Expression::CFalse;
+        match print(print_stmt, &env) {
+            Ok(result) => assert_eq!(result, Expression::CString("False".to_string())),
+            Err(e) => assert!(false, "Erro ao executar função Print: {}", e),
+        }
+    }
+
     #[test]
     fn eval_constant() {
         let env = HashMap::new();
