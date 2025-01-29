@@ -344,7 +344,7 @@ mod tests {
 
 
     #[test]
-    fn test_print() {
+    fn eval_print() {
         let env = HashMap::new();
         let print_stmt = Expression::Print(Box::new(Expression::CString("Testando print".to_string())));
         match print(print_stmt, &env) {
