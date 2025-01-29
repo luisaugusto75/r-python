@@ -283,22 +283,17 @@ fn lte(lhs: Expression, rhs: Expression, env: &Environment) -> Result<Expression
         "(<=) is only defined for numbers (integers and real).",
     )
 }
-pub fn print(exp: Expression, env: &Environment) -> Result<Expression, ErrorMessage> {
-    match exp {
-        Expression::Print(content) => {
-            let value = eval(*content, env)?;
-            match value {
-                Expression::CString(s) => {
-                    println!("{}", s);
-                    Ok(Expression::CString(s))
-                }
-                _ => Err(String::from("print function only accepts strings.")),
-            }
+
+pub fn print(content: Expression, env: &Environment) -> Result<Expression, ErrorMessage>
+{
+        match content { Expression::CString(s) =>
+        {
+            println!("{}", s);
+            Ok(Expression::CString(s))
         }
-        _ => Err(String::from("Not implemented yet.")),
+    _ => Err(String::from("Print function only accepts strings.")),
     }
 }
-
 
 pub fn execute(stmt: Statement, env: Environment) -> Result<Environment, ErrorMessage> {
     match stmt {
@@ -342,14 +337,13 @@ mod tests {
     use crate::ir::ast::Statement::*;
     use approx::relative_eq;
 
-
     #[test]
-    fn test_print() {
+    fn eval_print() {
         let env = HashMap::new();
-        let print_stmt = Expression::Print(Box::new(Expression::CString("Testando print".to_string())));
+        let print_stmt = Expression::CString("Testando print".to_string());
         match print(print_stmt, &env) {
             Ok(result) => assert_eq!(result, Expression::CString("Testando print".to_string())),
-            Err(e) => assert!(false, "Erro ao executar print: {}", e),
+            Err(e) => assert!(false, "Erro ao executar função Print: {}", e),
         }
 }
     #[test]
