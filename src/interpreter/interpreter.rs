@@ -23,6 +23,8 @@ pub fn eval(exp: Expression, env: &Environment) -> Result<Expression, ErrorMessa
         Expression::LTE(lhs, rhs) => lte(*lhs, *rhs, env),
         Expression::Var(name) => lookup(name, env),
         Expression::Print(exp) => print(*exp, env),
+        Expression::ReadString => read_string(),
+
         _ if is_constant(exp.clone()) => Ok(exp),
         _ => Err(String::from("Not implemented yet.")),
     }
@@ -299,6 +301,20 @@ pub fn print(exp: Expression, env: &Environment) -> Result<Expression, ErrorMess
     }
 }
 
+pub fn read_string() -> Result<Expression, ErrorMessage> {
+    use std::io::{self, Write};
+
+    io::stdout().flush().expect("Erro ao limpar o buffer");
+
+    let mut input = String::new();
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Erro ao ler a entrada");
+
+    let trimmed_input = input.trim().to_string();
+    Ok(Expression::CString(trimmed_input))
+}
+
 
 pub fn execute(stmt: Statement, env: Environment) -> Result<Environment, ErrorMessage> {
     match stmt {
@@ -342,6 +358,13 @@ mod tests {
     use crate::ir::ast::Statement::*;
     use approx::relative_eq;
 
+    #[test]
+    fn eval_read_string() {
+        let input = Expression::ReadString;
+        let result = read_string().unwrap();
+        assert!(matches!(result, Expression::CString(_)));
+    }
+    
 
     #[test]
     fn eval_print() {

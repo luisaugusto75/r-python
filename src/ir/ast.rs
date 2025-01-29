@@ -43,6 +43,7 @@ pub enum Expression {
 
     /*print function */
     Print(Box<Expression>),
+    ReadString,
 }
 
 #[derive(Debug, PartialEq, Clone)]
