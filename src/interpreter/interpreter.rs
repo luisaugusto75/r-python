@@ -285,19 +285,35 @@ fn lte(lhs: Expression, rhs: Expression, env: &Environment) -> Result<Expression
         "(<=) is only defined for numbers (integers and real).",
     )
 }
-pub fn print(exp: Expression, env: &Environment) -> Result<Expression, ErrorMessage> {
-    match exp {
-        Expression::Print(content) => {
-            let value = eval(*content, env)?;
-            match value {
-                Expression::CString(s) => {
-                    println!("{}", s);
-                    Ok(Expression::CString(s))
-                }
-                _ => Err(String::from("print function only accepts strings.")),
-            }
+
+pub fn print(content: Expression, env: &Environment) -> Result<Expression, ErrorMessage>
+{
+        match content { Expression::CString(s) =>
+        {
+            println!("{}", s);
+            Ok(Expression::CString(s))
         }
-        _ => Err(String::from("Not implemented yet.")),
+        Expression::CInt(i) =>
+        {
+            println!("{}", i);
+            Ok(Expression::CInt(i))
+        }
+        Expression::CReal(f) =>
+        {
+            println!("{:.16}", f);
+            Ok(Expression::CReal(f))
+        }
+        Expression::CTrue =>
+        {
+            println!("True");
+            Ok(Expression::CString("True".to_string()))
+        }
+        Expression::CFalse =>
+        {
+            println!("False");
+            Ok(Expression::CString("False".to_string()))
+        }
+    _ => Err(String::from("Print function does not accept this format.")),
     }
 }
 
@@ -369,12 +385,53 @@ mod tests {
     #[test]
     fn eval_print() {
         let env = HashMap::new();
-        let print_stmt = Expression::Print(Box::new(Expression::CString("Testando print".to_string())));
+        let print_stmt = Expression::CString("Testando print".to_string());
         match print(print_stmt, &env) {
             Ok(result) => assert_eq!(result, Expression::CString("Testando print".to_string())),
-            Err(e) => assert!(false, "Erro ao executar print: {}", e),
+            Err(e) => assert!(false, "Erro ao executar função Print: {}", e),
         }
-}
+    }
+
+    #[test]
+    fn eval_print_int() {
+        let env = HashMap::new();
+        let print_stmt = Expression::CInt(1);
+        match print(print_stmt, &env) {
+            Ok(result) => assert_eq!(result, Expression::CInt(1)),
+            Err(e) => assert!(false, "Erro ao executar função Print: {}", e),
+        }
+    }
+    
+    #[test]
+    fn eval_print_float() {
+        let env = HashMap::new();
+        let print_stmt = Expression::CReal(1.00);
+        match print(print_stmt, &env) {
+            Ok(result) => assert_eq!(result, Expression::CReal(1.00)),
+            Err(e) => assert!(false, "Erro ao executar função Print: {}", e),
+        }
+    }
+
+    #[test]
+    fn eval_print_true() {
+        let env = HashMap::new();
+        let print_stmt = Expression::CTrue;
+        match print(print_stmt, &env) {
+            Ok(result) => assert_eq!(result, Expression::CString("True".to_string())),
+            Err(e) => assert!(false, "Erro ao executar função Print: {}", e),
+        }
+    }
+
+    #[test]
+    fn eval_print_false() {
+        let env = HashMap::new();
+        let print_stmt = Expression::CFalse;
+        match print(print_stmt, &env) {
+            Ok(result) => assert_eq!(result, Expression::CString("False".to_string())),
+            Err(e) => assert!(false, "Erro ao executar função Print: {}", e),
+        }
+    }
+
     #[test]
     fn eval_constant() {
         let env = HashMap::new();
